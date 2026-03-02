@@ -7,6 +7,7 @@ __pycache__/
 *.csv
 *.jpg
 *.png
+environment-manga-local.yml
 environment-build.yml
 build/
 dist/
