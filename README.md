@@ -26,7 +26,7 @@ The `plotting` module contains functions that can be used to quickly produce sci
 
 The `helpers` module contains commonly used functions in the above modules.
 
-A demonstration of how to use these functions to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `demo.ipynb`
+A demonstration of how to use these functions to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `/demo/dvsg_demo.ipynb`.
 
 ## Installation
 
