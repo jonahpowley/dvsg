@@ -26,6 +26,8 @@ The `plotting` module contains functions that can be used to quickly produce sci
 
 The `helpers` module contains commonly used functions in the above modules.
 
+A demonstration of how to use these functions to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `demo.ipynb`
+
 ## Installation
 
 To calculate $\Delta V_{\star-g}$ on numeric velocity arrays only, use the `core` install. For additional use of MaNGA/Marvin map loading, use `manga`.
