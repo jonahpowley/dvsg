@@ -12,4 +12,3 @@ environment-build.yml
 build/
 dist/
 src/dvsg/boneyard/
-src/dvsg/preprocessing_othernorm.py
