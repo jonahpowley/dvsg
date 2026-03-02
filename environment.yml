@@ -5,9 +5,8 @@ channels:
 
 dependencies:
   - python=3.11
-  - numpy
-  - scipy
-  - astropy
+  - numpy>=1.24,<2
+  - scipy>=1.9
+  - astropy>=6
+  - matplotlib>=3.7
   - pip
-  - pip:
-    - git+https://github.com/jmpowley/dvsg.git

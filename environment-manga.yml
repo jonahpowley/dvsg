@@ -5,17 +5,17 @@ channels:
 
 dependencies:
   - python=3.11
-  - numpy>=1.26.4,<2
-  - scipy>=1.13.1
-  - matplotlib>=3.8
-  - astropy>=6,<7
+  - numpy>=1.24,<2
+  - scipy>=1.9
+  - matplotlib>=3.7
+  - astropy>=6
   - packaging=20.9
   - setuptools<81
+  - wheel<0.46
+  - ipykernel=6.29.5
   - pip
   - pip:
     - marshmallow<4
     - webargs<6
-    - marvin
     - sdss-marvin>=2.8.2
     - sdss-mangadap>=4.3.0
-    - git+https://github.com/jmpowley/dvsg.git
