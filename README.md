@@ -28,42 +28,55 @@ The `helpers` module contains commonly used functions in the above modules.
 
 ## Installation
 
-Choose installation mode based on whether you need only core DVSG calculations,
-or full MaNGA/Marvin map-loading support.
+To calculate $\Delta V_{\star-g}$ on numeric velocity arrays only, use the `core` install. For additional use of MaNGA/Marvin map loading, use `manga`.
 
 ### Using pip
 
 ```bash
-# Core DVSG dependencies only
+# Core
 pip install dvsg
 
-# Core + MaNGA/Marvin dependencies
+# Core + MaNGA/Marvin
 pip install "dvsg[manga]"
 ```
 
 ### Using conda
 
 ```bash
-# Core environment
+# Core environment + dvsg
 conda env create -f environment.yml
+conda activate dvsg-env
+python -m pip install dvsg --no-deps
 
-# Environment with MaNGA/Marvin dependencies
+# MaNGA/Marvin environment + dvsg
 conda env create -f environment-manga.yml
+conda activate dvsg-manga-env
+python -m pip install dvsg --no-deps
 ```
 
-### Development mode
+### Development installation
+
+If you want to install the development version:
 
 ```bash
 # Clone the repository
 git clone https://github.com/jmpowley/dvsg.git
 cd dvsg
 
-# Core editable install
-pip install -e .
+# Editable install in a pinned conda environment
+python -m pip install -e . --no-deps
 
-# Editable install with MaNGA/Marvin support
-pip install -e ".[manga]"
+# Editable install in a plain pip environment
+python -m pip install -e ".[manga]"
 ```
+
+For local MaNGA development with strict pins (e.g. `packaging=20.9`,
+`setuptools<81`, `wheel<0.46`), prefer:
+```bash
+python -m pip install -e /path/to/dvsg --no-deps
+```
+
+### Environment variables
 
 Some functions in `helpers` rely on a local installation of MaNGA Data Analysis Pipeline (DAP) products. If you would like to use these functions, you will need to define the environment variables outlined in the [DAP documentation](https://sdss-mangadap.readthedocs.io/en/latest/execution.html#local-environment-setup-for-survey-level-manga-analysis).
 
