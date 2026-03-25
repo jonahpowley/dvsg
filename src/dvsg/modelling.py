@@ -11,10 +11,13 @@ __all__ = [
     "MapModel",
 ]
 
-# -------------
+# ------------
 # Mask helpers
-# -------------
-def cookie_cutter(array: np.ndarray, size: int, set_edges_to_nan: bool):
+# ------------
+def cookie_cutter(array: np.ndarray, 
+                  size: int, 
+                  set_edges_to_nan: bool
+                  ):
     """Apply an octagon-like edge mask to a square 2D array."""
 
     size = array.shape[0]
@@ -124,6 +127,7 @@ class MapModel:
 
     def _initialise_map(self):
         """Build map from requested model type."""
+
         map_builders = {
             "rotation_dominated": self.rotation_dominated_map,
             "dispersion_dominated": self.dispersion_dominated_map,
@@ -139,6 +143,7 @@ class MapModel:
 
     def _load_input(self):
         """Load user-provided map and mask into the model."""
+
         map = self.input_map
         mask = self.input_mask
 
@@ -183,7 +188,7 @@ class MapModel:
 
     def rotation_dominated_map(self, v_max=200., r_turn=5., incl=60., pa=0., v_sys=0., normalise=True, return_meta=False):
         """
-        Build a toy axisymmetric rotation-dominated LOS velocity map.
+        Build a toy axisymmetric rotation-dominated line-of-sight velocity map.
         """
 
         # Convert to radians
@@ -207,22 +212,23 @@ class MapModel:
         v_rot = v_max * (1.0 - np.exp(-R / r_turn))
 
         # Project into LOS
-        v_los = v_sys + v_rot * sini * np.cos(phi)
+        v_map = v_sys + v_rot * sini * np.cos(phi)
 
         # Normalise map after applying cookie cutter
-        v_los_cut = cookie_cutter(v_los, self.size, set_edges_to_nan=True)
+        v_map_cut = cookie_cutter(v_map, self.size, set_edges_to_nan=True)
         if normalise:
-            v_los_cut = minmax_normalise_velocity_map(v_los_cut)
+            v_map_cut = minmax_normalise_velocity_map(v_map_cut)
 
-        # Return map and, optionally, metadata
+        # Return map with optional metadata
         meta = dict(v_max=v_max, r_turn=r_turn, incl_deg=incl, pa_deg=pa, v_sys=v_sys)
         if return_meta:
-            return v_los_cut, meta
+            return v_map_cut, meta
         else:
-            return v_los_cut
+            return v_map_cut
 
     def dispersion_dominated_map(self, sigma0=80.0, normalise=True):
         """Build a toy dispersion-dominated velocity map."""
+        
         # Zero mean, Gaussian scatter everywhere
         v_map = self.rng.normal(loc=0.0, scale=sigma0, size=(self.size, self.size))
 
@@ -232,56 +238,3 @@ class MapModel:
             v_map_cut = minmax_normalise_velocity_map(v_map_cut)
 
         return v_map_cut
-
-    def apply_asymmetric_drift(self, v_circ_map, sigma_R_map, surface_density_map,
-                               kappa_factor=1.0):
-        """
-        Apply a simplified asymmetric-drift correction to a velocity field.
-        """
-        # compute radial derivative in log-space
-        eps = 1e-8
-        _, _, R, _ = self._grid_r_theta()
-
-        # avoid divide by zero at center
-        log_term = np.log(surface_density_map * (sigma_R_map**2) + eps)
-        # radial derivative: d ln(...) / d ln R = R * d/dR log_term
-        # compute d/dR via central differences in radial bins
-        # first compute radial profile by binning (simple approach)
-        r_flat = R.ravel()
-        bins = np.unique(np.round(r_flat)).astype(int)
-        # compute radial derivative profile
-        bin_centers = bins + 0.5
-        profile = np.zeros_like(bin_centers, dtype=float)
-        counts = np.zeros_like(bin_centers, dtype=int)
-        for i, b in enumerate(bins):
-            mask = (np.floor(R) == b)
-            if np.any(mask):
-                profile[i] = np.nanmean(log_term[mask])
-                counts[i] = np.count_nonzero(mask)
-            else:
-                profile[i] = np.nan
-
-        # finite-diff d profile/d ln r
-        # avoid r=0 bin
-        dln = np.zeros_like(profile)
-        for i in range(1, len(profile)-1):
-            if np.isfinite(profile[i-1]) and np.isfinite(profile[i+1]):
-                dln[i] = (profile[i+1] - profile[i-1]) / (np.log(bin_centers[i+1]) - np.log(bin_centers[i-1]))
-        # map radial derivative back to map
-        dln_map = np.zeros_like(R)
-        for i, b in enumerate(bins):
-            mask = (np.floor(R) == b)
-            dln_map[mask] = dln[i]
-
-        # adopt sigma_phi^2 / sigma_R^2 ~ 0.5 * kappa_factor (user can tune)
-        sigma_phi2_over_sigma_R2 = 0.5 * kappa_factor
-
-        v_circ2 = v_circ_map**2
-        correction = sigma_R_map**2 * (dln_map + 1.0 - sigma_phi2_over_sigma_R2)
-        v_phi2 = np.maximum(0.0, v_circ2 - correction)
-        v_phi = np.sqrt(v_phi2)
-
-        # projection to LOS depends on geometry; if v_circ_map was LOS-projected
-        # we must de-project and re-project; for this simple demo assume v_circ_map is intrinsic v_phi already.
-        # Return v_phi (intrinsic streaming). Caller should project it via same geometry as rotation_map.
-        return v_phi
