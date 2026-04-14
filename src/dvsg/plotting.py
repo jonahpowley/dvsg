@@ -5,7 +5,7 @@ from matplotlib.ticker import FixedLocator
 
 from mangadap.util.fitsutil import DAPFitsUtil
 
-from .helpers import load_maps, return_bin_coords
+from .helpers import load_maps
 from .preprocessing import (
     preprocess_maps_from_plateifu,
     mask_velocity_maps, 
@@ -82,9 +82,10 @@ def reconstruct_stellar_gas_residual_maps(plateifu: str, **dvsg_kwargs):
 
     # Load bin information
     sv_map, _, sv_mask, _, _, _, bin_ids, bin_snr = load_maps(plateifu, **dvsg_kwargs)
-    sv_bins = bin_ids[1]
-    return_bin_coords(sv_bins)
-    bin_snr_mask = bin_snr < dvsg_kwargs["snr_threshold"]
+    if dvsg_kwargs.get("snr_threshold") is None:
+        bin_snr_mask = np.zeros_like(bin_snr, dtype=bool)
+    else:
+        bin_snr_mask = bin_snr < dvsg_kwargs["snr_threshold"]
 
     # Load flat maps
     sv_norm, gv_norm = preprocess_maps_from_plateifu(plateifu, **dvsg_kwargs)
@@ -95,7 +96,7 @@ def reconstruct_stellar_gas_residual_maps(plateifu: str, **dvsg_kwargs):
     # Reconstruct maps
     map_shape = sv_map.shape
     bins = bin_ids[1]
-    mask = sv_mask & bin_snr_mask
+    mask = sv_mask.astype(bool) | bin_snr_mask
     sv_norm_recon = transform_flat_to_map(sv_norm, map_shape, bins, mask)
     gv_norm_recon = transform_flat_to_map(gv_norm, map_shape, bins, mask)
     residual_recon = transform_flat_to_map(residual, map_shape, bins, mask)
