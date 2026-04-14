@@ -24,13 +24,13 @@ The `modelling` module contains the `MapModel` class, which can create basic moc
 
 The `plotting` module contains functions that can be used to quickly produce science plots from a $\Delta V_{\star-g}$ calculation.
 
-The `helpers` module contains commonly used functions in the above modules.
+The `helpers` module contains MaNGA-specific loading and bin utilities used by the plateifu-based workflows.
 
-A demonstration of how to use these functions to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `/demo/dvsg_demo.ipynb`.
+A demonstration of how to use the MaNGA workflow to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `/demo/dvsg_demo.ipynb`.
 
 ## Installation
 
-To calculate $\Delta V_{\star-g}$ on numeric velocity arrays only, use the `core` install. For additional use of MaNGA/Marvin map loading, use `manga`.
+To calculate $\Delta V_{\star-g}$ on numeric velocity arrays only, use the base install. For MaNGA/Marvin map loading and plateifu-based workflows (e.g., preprocessing & plotting), use `manga`.
 
 ### Using pip
 
@@ -72,7 +72,7 @@ python -m pip install -e . --no-deps
 python -m pip install -e ".[manga]"
 ```
 
-For local MaNGA development with strict pins (e.g. `packaging=20.9`,
+For local MaNGA development, some packages (e.g. `sdss-marvin`) can require stricter pins when setting up notebook environments. To install `dvsg` with strict pins (e.g. `packaging=20.9`,
 `setuptools<81`, `wheel<0.46`), prefer:
 ```bash
 python -m pip install -e /path/to/dvsg --no-deps
@@ -84,4 +84,4 @@ Some functions in `helpers` rely on a local installation of MaNGA Data Analysis 
 
 ## Citation
 
-If you use this code in your research, please cite Powley et al. (submitted.).
+If you use this code in your research, please cite Powley et al. (2026).
