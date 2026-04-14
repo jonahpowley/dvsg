@@ -4,11 +4,12 @@ import numpy as np
 
 from astropy.table import Table, MaskedColumn
 
-from .helpers import load_maps, load_map_coords, return_bin_indices, return_bin_coord_centres
 from .preprocessing import preprocess_maps_from_plateifu, mask_velocity_maps, mask_binned_map, apply_bin_snr_threshold, apply_sigma_clip
 
 __all__ = [
     "calculate_dvsg",
+    "calculate_dvsg_residual",
+    "calculate_dvsg_diagnostics",
     "calculate_radial_dvsg",
     "calculate_dvsg_error",
     "calculate_dvsg_from_plateifu",
@@ -17,11 +18,43 @@ __all__ = [
     "return_dvsg_table_from_plateifus",
 ]
 
+
+def _load_maps(plateifu, **dvsg_kwargs):
+    """Load MaNGA maps only when plateifu routines are called."""
+
+    from .helpers import load_maps
+
+    return load_maps(plateifu, **dvsg_kwargs)
+
+
+def _load_map_coords(plateifu, **dvsg_kwargs):
+    """Load MaNGA map coordinates only when needed."""
+
+    from .helpers import load_map_coords
+
+    return load_map_coords(plateifu, **dvsg_kwargs)
+
+
+def _return_bin_indices(bin_ids):
+    """Load MaNGA bin indices only when needed."""
+
+    from .helpers import return_bin_indices
+
+    return return_bin_indices(bin_ids)
+
+
+def _return_bin_coord_centres(bin_ra, bin_dec, sv_uindx, gv_uindx):
+    """Load MaNGA bin centres only when needed."""
+
+    from .helpers import return_bin_coord_centres
+
+    return return_bin_coord_centres(bin_ra, bin_dec, sv_uindx, gv_uindx)
+
 # ---------------------
 # Calculation functions
 # ---------------------
 def calculate_dvsg(sv_norm, gv_norm):
-    """Calculate DVSG from aligned normalised stellar and gas arrays.
+    """Calculate DVSG from normalised stellar and gas arrays.
 
     Parameters
     ----------
@@ -50,7 +83,7 @@ def calculate_dvsg(sv_norm, gv_norm):
 
 
 def calculate_dvsg_residual(sv_norm, gv_norm):
-    """Calculate DVSG from aligned normalised stellar and gas arrays.
+    """Calculate DVSG residual from normalised stellar and gas arrays.
 
     Parameters
     ----------
@@ -74,8 +107,41 @@ def calculate_dvsg_residual(sv_norm, gv_norm):
     return residual
 
 
+def calculate_dvsg_diagnostics(sv_norm, gv_norm):
+    """Calculate DVSG diagnostics from normalised stellar and gas arrays.
+
+    Parameters
+    ----------
+    sv_norm : array_like
+        Normalised stellar velocity map
+    gv_norm : array_like
+        Normalised gas velocity map
+
+    Returns
+    -------
+    output : dict
+        Dictionary containing ``dvsg``, ``dvsg_stderr`` and ``residual``.
+    """
+
+    residual = calculate_dvsg_residual(sv_norm, gv_norm)
+    n_valid = np.count_nonzero(np.isfinite(residual))
+    if n_valid == 0:
+        dvsg_stderr = np.nan
+    else:
+        dvsg_stderr = np.nanstd(residual) / np.sqrt(n_valid)
+
+    output = {}
+    output["dvsg"] = calculate_dvsg(sv_norm, gv_norm)
+    output["dvsg_stderr"] = dvsg_stderr
+    output["residual"] = residual
+
+    return output
+
+
 def calculate_dvsg_error(sv_ivar, gv_ivar, sv_clip, gv_clip):
-    """Calculate analytic DVSG uncertainty from IVAR maps.
+    """Calculate analytic DVSG uncertainty from inverse variance maps.
+
+    For the derivation of this formula, see Appendix A of Powley et al. (2026).
 
     Parameters
     ----------
@@ -93,23 +159,26 @@ def calculate_dvsg_error(sv_ivar, gv_ivar, sv_clip, gv_clip):
         Uncertainty from error propagation.
     """
 
-    # Calculate unnormalised ranges
-    sv_range = np.nanmax(sv_clip) - np.nanmin(sv_clip)
-    gv_range = np.nanmax(gv_clip) - np.nanmin(gv_clip)
-
     # Convert ivar to sigma, but only where ivar is positive and finite
     sv_ok = np.isfinite(sv_clip) & np.isfinite(sv_ivar) & (sv_ivar > 0)
     gv_ok = np.isfinite(gv_clip) & np.isfinite(gv_ivar) & (gv_ivar > 0)
     ok = sv_ok & gv_ok
-
-    sv_err = np.sqrt(1.0 / sv_ivar[ok])
-    gv_err = np.sqrt(1.0 / gv_ivar[ok])
 
     # Check for null entries
     n = np.count_nonzero(ok)
     if n == 0:
         warnings.warn("DVSG error could not be calculated: no okay points", UserWarning)
         return None
+
+    # Calculate unnormalised ranges
+    sv_range = np.nanmax(sv_clip) - np.nanmin(sv_clip)
+    gv_range = np.nanmax(gv_clip) - np.nanmin(gv_clip)
+    if (not np.isfinite(sv_range)) or (not np.isfinite(gv_range)) or (sv_range == 0) or (gv_range == 0):
+        warnings.warn("DVSG error could not be calculated: invalid velocity range", UserWarning)
+        return None
+
+    sv_err = np.sqrt(1.0 / sv_ivar[ok])
+    gv_err = np.sqrt(1.0 / gv_ivar[ok])
 
     # Calculate error
     term = ((2.0 / sv_range) * sv_err) ** 2 + ((2.0 / gv_range) * gv_err) ** 2
@@ -185,7 +254,7 @@ def calculate_dvsg_diagnostics_from_plateifu(plateifu, **dvsg_kwargs):
     sv_norm, gv_norm = preprocess_maps_from_plateifu(plateifu, **dvsg_kwargs)
 
     # Load flattened variance and sigma-clipped maps
-    sv_map, gv_map, sv_mask, gv_mask, sv_ivar, gv_ivar, bin_ids, bin_snr = load_maps(plateifu, **dvsg_kwargs)
+    sv_map, gv_map, sv_mask, gv_mask, sv_ivar, gv_ivar, bin_ids, bin_snr = _load_maps(plateifu, **dvsg_kwargs)
     sv_flat, gv_flat = mask_velocity_maps(sv_map, gv_map, sv_mask, gv_mask, bin_ids)
     sv_ivar_flat, gv_ivar_flat = mask_velocity_maps(sv_ivar, gv_ivar, sv_mask, gv_mask, bin_ids)
     bin_snr_flat = mask_binned_map(bin_snr, sv_mask, bin_ids)
@@ -204,19 +273,18 @@ def calculate_dvsg_diagnostics_from_plateifu(plateifu, **dvsg_kwargs):
 
 def calculate_radial_dvsg_from_plateifu(plateifu: str, dvsg_kwargs: dict):
     """Calculate radial DVSG components for one plateifu."""
-    # TODO: Refactor
 
-    # Load preprocessed maps
-    sv_norm, gv_norm = preprocess_maps_from_plateifu(plateifu, **dvsg_kwargs)
+    dvsg_kwargs = dvsg_kwargs.copy()
+    dvsg_kwargs["return_residual"] = True
 
     output = calculate_dvsg_diagnostics_from_plateifu(plateifu, **dvsg_kwargs)
     residual = output["residual"]
 
     # Load bin information
-    _, _, _, _, _, _, bin_ids, _ = load_maps(plateifu, **dvsg_kwargs)
-    _, _, bin_ra, bin_dec = load_map_coords(plateifu, **dvsg_kwargs)
-    _, sv_uindx, _, gv_uindx = return_bin_indices(bin_ids)
-    bin_centres = return_bin_coord_centres(bin_ra, bin_dec, sv_uindx, gv_uindx)
+    _, _, _, _, _, _, bin_ids, _ = _load_maps(plateifu, **dvsg_kwargs)
+    _, _, bin_ra, bin_dec = _load_map_coords(plateifu, **dvsg_kwargs)
+    _, sv_uindx, _, gv_uindx = _return_bin_indices(bin_ids)
+    bin_centres = _return_bin_coord_centres(bin_ra, bin_dec, sv_uindx, gv_uindx)
 
     # Calculate radial dvsg
     bin_dists, residual = calculate_radial_dvsg(bin_centres, residual, **dvsg_kwargs)

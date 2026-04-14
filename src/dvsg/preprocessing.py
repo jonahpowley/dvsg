@@ -1,7 +1,5 @@
 import numpy as np
 
-from .helpers import return_bin_indices, load_maps
-
 __all__ = [
     "exclude_above_n_sigma",
     "minmax_normalise_velocity_map",
@@ -13,6 +11,22 @@ __all__ = [
     "normalise_map",
     "preprocess_maps_from_plateifu",
 ]
+
+
+def _return_bin_indices(bin_ids):
+    """Load bin indices only when MaNGA helpers are needed."""
+
+    from .helpers import return_bin_indices
+
+    return return_bin_indices(bin_ids)
+
+
+def _load_maps(plateifu, **dvsg_kwargs):
+    """Load MaNGA maps only when plateifu routines are called."""
+
+    from .helpers import load_maps
+
+    return load_maps(plateifu, **dvsg_kwargs)
 
 # ------------------------
 # Sigma-clipping functions
@@ -100,7 +114,7 @@ def mask_velocity_maps(sv_map: np.ndarray, gv_map: np.ndarray, sv_mask: np.ndarr
     """
 
     # Get the unique indices of the stellar and gas velocity bins
-    _, sv_uindx, _, gv_uindx = return_bin_indices(bin_ids)
+    _, sv_uindx, _, gv_uindx = _return_bin_indices(bin_ids)
 
     # Apply mask and save a masked array
     sv_flat = np.ma.MaskedArray(sv_map.ravel()[sv_uindx], mask=sv_mask.ravel()[sv_uindx] > 0)
@@ -113,7 +127,7 @@ def mask_binned_map(map, mask, bin_ids, **extras):
     """Flatten a binned map to stellar-bin representatives and apply mask."""
 
     # Get the unique indices of the stellar and gas velocity bins
-    _, sv_uindx, _, _ = return_bin_indices(bin_ids)
+    _, sv_uindx, _, _ = _return_bin_indices(bin_ids)
 
     flat = np.ma.MaskedArray(map.ravel()[sv_uindx], mask=mask.ravel()[sv_uindx] > 0)
 
@@ -198,7 +212,7 @@ def preprocess_maps_from_plateifu(plateifu: str, **dvsg_kwargs):
         )
 
     # Load map
-    sv_map, gv_map, sv_mask, gv_mask, _, _, bin_ids, bin_snr = load_maps(plateifu, **dvsg_kwargs)
+    sv_map, gv_map, sv_mask, gv_mask, _, _, bin_ids, bin_snr = _load_maps(plateifu, **dvsg_kwargs)
     # Extract masked values and flatten
     sv_flat, gv_flat = mask_velocity_maps(sv_map, gv_map, sv_mask, gv_mask, bin_ids)
     bin_snr_flat = mask_binned_map(bin_snr, sv_mask, bin_ids)  # use stellar velocity mask
