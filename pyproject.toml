@@ -5,15 +5,23 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dvsg"
 version = "0.1.0"
-description = "Python code to the calculate the kinematic disturbance parameter DVSG"
+description = "Calculate the kinematic disturbance parameter DVSG"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
+authors = [
+  {name = "Jonah Powley", email = "jmp258@cam.ac.uk"},
+]
 dependencies = [
   "numpy>=1.24,<2",
   "scipy>=1.9",
   "astropy>=6",
   "matplotlib>=3.7",
 ]
+
+[project.urls]
+Homepage = "https://github.com/jmpowley/dvsg"
+Repository = "https://github.com/jmpowley/dvsg"
+Issues = "https://github.com/jmpowley/dvsg/issues"
 
 [project.optional-dependencies]
 manga = [
@@ -29,6 +37,7 @@ dev = [
 ]
 build = [
   "build>=1.4",
+  "twine>=5",
 ]
 
 [tool.setuptools]
