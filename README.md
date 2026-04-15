@@ -28,35 +28,7 @@ The `helpers` module contains MaNGA-specific loading and bin utilities used by t
 
 A demonstration of how to use the MaNGA workflow to calculate $\Delta V_{\star-g}$ and visualise the results is provided in `/demo/dvsg_demo.ipynb`.
 
-## Installation
-
-To calculate $\Delta V_{\star-g}$ on numeric velocity arrays only, use the base install. For MaNGA/Marvin map loading and plateifu-based workflows (e.g., preprocessing & plotting), use `manga`.
-
-### Using pip
-
-```bash
-# Core
-pip install dvsg
-
-# Core + MaNGA/Marvin
-pip install "dvsg[manga]"
-```
-
-### Using conda
-
-```bash
-# Core environment + dvsg
-conda env create -f environment.yml
-conda activate dvsg-env
-python -m pip install dvsg --no-deps
-
-# MaNGA/Marvin environment + dvsg
-conda env create -f environment-manga.yml
-conda activate dvsg-manga-env
-python -m pip install dvsg --no-deps
-```
-
-### Development installation
+## Development
 
 If you want to install the development version:
 
@@ -84,4 +56,4 @@ Some functions in `helpers` rely on a local installation of MaNGA Data Analysis 
 
 ## Citation
 
-If you use this code in your research, please cite Powley et al. (2026).
+If you use this code in your research, please cite Powley et al. Citation details will be updated once the paper is available through arXiv/ADS.
