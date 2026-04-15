@@ -58,8 +58,6 @@ Some functions in `helpers` rely on a local installation of MaNGA Data Analysis 
 
 If you use this code in your research, please cite Powley et al. (2026).
 
-If you use this code in your research, please cite Powley et al. (2026).
-
 ```bibtex
 
 @article{2026arXiv260411905P, 
