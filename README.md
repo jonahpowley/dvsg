@@ -56,4 +56,4 @@ Some functions in `helpers` rely on a local installation of MaNGA Data Analysis 
 
 ## Citation
 
-If you use this code in your research, please cite Powley et al. Citation details will be updated once the paper is available through arXiv/ADS.
+If you use this code in your research, please cite Powley et al. (2026).
