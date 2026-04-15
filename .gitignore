@@ -12,3 +12,4 @@ environment-build.yml
 build/
 dist/
 boneyard/
+README-PyPI.md
