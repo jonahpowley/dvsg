@@ -57,3 +57,16 @@ Some functions in `helpers` rely on a local installation of MaNGA Data Analysis 
 ## Citation
 
 If you use this code in your research, please cite Powley et al. (2026).
+
+If you use this code in your research, please cite Powley et al. (2026).
+
+```bibtex
+
+@article{2026arXiv260411905P, 
+    author = {{Powley}, Jonah M. and {Smethurst}, Rebecca J. and {Lintott}, Chris J. and {G{\'e}ron}, Tobias}, 
+    title = "{Introducing $ΔV_{\star-g}$: a new universal kinematic disturbance parameter}", 
+    journal = {arXiv e-prints}, 
+    pages = {arXiv:2604.11905}, 
+    year = {2026},
+}
+```
