@@ -60,11 +60,12 @@ If you use this code in your research, please cite Powley et al. (2026).
 
 ```bibtex
 
-@article{2026arXiv260411905P, 
-    author = {{Powley}, Jonah M. and {Smethurst}, Rebecca J. and {Lintott}, Chris J. and {G{\'e}ron}, Tobias}, 
-    title = "{Introducing $ΔV_{\star-g}$: a new universal kinematic disturbance parameter}", 
-    journal = {arXiv e-prints}, 
-    pages = {arXiv:2604.11905}, 
-    year = {2026},
+@article{Powley2026_dvsg,
+  author  = {Powley, Jonah M. and Smethurst, Rebecca J. and Lintott, Chris J. and G{\'e}ron, Tobias},
+  title   = {Introducing $\Delta V_{\star-g}$: a new universal kinematic disturbance parameter},
+  journal = {Monthly Notices of the Royal Astronomical Society},
+  year    = {2026},
+  doi     = {10.1093/mnras/stag747},
+  eid     = {stag747}
 }
 ```
