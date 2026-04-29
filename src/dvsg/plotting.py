@@ -259,11 +259,17 @@ def plot_stellar_gas_residual_maps(
     sv_ticker, gv_ticker = format_ticks(sv_ticks, gv_ticks, orig_ticks)
     sv_loc, sv_labs = sv_ticker
     gv_loc, gv_labs = gv_ticker
+    if orig_ticks:
+        sv_cbar_label = r"$V_{\star}~\rm{[Norm.~(km~s^{-1})]}$"
+        gv_cbar_label = r"$V_{\rm g}~\rm{[Norm.~(km~s^{-1})]}$"
+    else:
+        sv_cbar_label = r"$V_{\star}~\rm{[Norm.]}$"
+        gv_cbar_label = r"$V_{\rm g}~\rm{[Norm.]}$"
 
     # Stellar panel
     im0 = ax[0].imshow(sv_norm, cmap="RdBu_r", origin="lower", extent=[x_as.max(), x_as.min(), y_as.min(), y_as.max()])
     cb0 = ax[0].figure.colorbar(im0, ax=ax[0], fraction=0.05, pad=0.03)
-    cb0.set_label(r"$V_{\star}~\rm{[Norm.~(km~s^{-1})]}$", labelpad=labelpad, fontsize=labsize)
+    cb0.set_label(sv_cbar_label, labelpad=labelpad, fontsize=labsize)
     cb0.set_ticks(sv_loc.locs)
     cb0.set_ticklabels(sv_labs)
     cb0.ax.tick_params(axis="y", which="major", labelsize=tcksize)
@@ -272,7 +278,7 @@ def plot_stellar_gas_residual_maps(
     # Gas panel
     im1 = ax[1].imshow(gv_norm, cmap="RdBu_r", origin="lower", extent=[x_as.max(), x_as.min(), y_as.min(), y_as.max()])
     cb1 = ax[1].figure.colorbar(im1, ax=ax[1], fraction=0.05, pad=0.03)
-    cb1.set_label(r"$V_{\rm g}~\rm{[Norm.~(km~s^{-1})]}$", labelpad=labelpad, fontsize=labsize)
+    cb1.set_label(gv_cbar_label, labelpad=labelpad, fontsize=labsize)
     cb1.set_ticks(gv_loc.locs)
     cb1.set_ticklabels(gv_labs)
     cb1.ax.tick_params(axis="y", which="major", labelsize=tcksize)
@@ -348,11 +354,17 @@ def plot_stellar_gas_residual_visual_maps(
     sv_ticker, gv_ticker = format_ticks(sv_ticks, gv_ticks, orig_ticks)
     sv_loc, sv_labs = sv_ticker
     gv_loc, gv_labs = gv_ticker
+    if orig_ticks:
+        sv_cbar_label = r"$V_{\star}~\rm{[Norm.~(km~s^{-1})]}$"
+        gv_cbar_label = r"$V_{\rm{g}}~\rm{[Norm.~(km~s^{-1})]}$"
+    else:
+        sv_cbar_label = r"$V_{\star}~\rm{[Norm.]}$"
+        gv_cbar_label = r"$V_{\rm{g}}~\rm{[Norm.]}$"
 
     # Stellar panel
     im0 = ax[0].imshow(sv_norm, cmap="RdBu_r", origin="lower", extent=[x_as.max(), x_as.min(), y_as.min(), y_as.max()])
     cb0 = ax[0].figure.colorbar(im0, ax=ax[0], fraction=0.0465, pad=0.03)
-    cb0.set_label(r"$V_{\star}~\rm{[Norm.~(km~s^{-1})]}$", labelpad=labelpad, fontsize=labsize)
+    cb0.set_label(sv_cbar_label, labelpad=labelpad, fontsize=labsize)
     cb0.set_ticks(sv_loc.locs)
     cb0.set_ticklabels(sv_labs)
     cb0.ax.tick_params(axis="y", which="major", labelsize=tcksize)
@@ -361,7 +373,7 @@ def plot_stellar_gas_residual_visual_maps(
     # Gas panel
     im1 = ax[1].imshow(gv_norm, cmap="RdBu_r", origin="lower", extent=[x_as.max(), x_as.min(), y_as.min(), y_as.max()])
     cb1 = ax[1].figure.colorbar(im1, ax=ax[1], fraction=0.0465, pad=0.03)
-    cb1.set_label(r"$V_{\rm{g}}~\rm{[Norm.~(km~s^{-1})]}$", labelpad=labelpad, fontsize=labsize)
+    cb1.set_label(gv_cbar_label, labelpad=labelpad, fontsize=labsize)
     cb1.set_ticks(gv_loc.locs)
     cb1.set_ticklabels(gv_labs)
     cb1.ax.tick_params(axis="y", which="major", labelsize=tcksize)
